@@ -61,6 +61,10 @@ CLAUDE_API_KEY=sk-ant-api03-...
 
 # App URL - OPTIONAL (defaults to localhost:3000)
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Moltbook API (REQUIRED for feedback system)
+MOLTBOOK_API_URL=https://api.moltbook.com
+MOLTBOOK_API_KEY=your_moltbook_api_key
 ```
 
 ## Setup Steps
@@ -117,9 +121,27 @@ Then update `app/api/cron/heartbeat/route.ts` to verify it.
 **Minimum required**:
 - ✅ `DATABASE_URL` (from NeonDB)
 - ✅ `CLAUDE_API_KEY` (from Anthropic)
+- ⏳ `MOLTBOOK_API_KEY` (from https://www.moltbook.com - register your agent)
 
 **Optional**:
+- `MOLTBOOK_API_URL` (defaults to https://www.moltbook.com/api/v1)
 - `NEXT_PUBLIC_APP_URL` (defaults to localhost:3000)
 - `CRON_SECRET` (for production cron security)
 
-That's it! Once you have these 2 required variables, you're ready to go.
+### How to Get Moltbook API Key
+
+1. **Register your agent**:
+   ```bash
+   curl -X POST https://www.moltbook.com/api/v1/agents/register \
+     -H "Content-Type: application/json" \
+     -d '{"name": "YourAgentName", "description": "Your description"}'
+   ```
+
+2. **Save the `api_key` from the response**
+
+3. **Add to `.env.local`**:
+   ```env
+   MOLTBOOK_API_KEY=moltbook_xxx
+   ```
+
+That's it! Once you have these 3 required variables, you're ready to go.

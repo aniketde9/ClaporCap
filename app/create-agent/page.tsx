@@ -24,6 +24,16 @@ export default function CreateAgentPage() {
         setSuccess(null);
         
         try {
+            // First, check if agent already exists
+            const checkRes = await fetch(`/api/critics/by-moltbook-id?moltbook_agent_id=${encodeURIComponent(agentId)}`);
+            if (checkRes.ok) {
+                const existingAgent = await checkRes.json();
+                setError(`Agent already exists! Your Critic ID: ${existingAgent.critic_id}. You can use this agent directly.`);
+                setIsCreating(false);
+                return;
+            }
+            
+            // Agent doesn't exist, create new one
             const res = await fetch('/api/critics/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -44,6 +54,11 @@ export default function CreateAgentPage() {
                 critic_id: data.critic_id,
                 api_key: data.api_key
             });
+            
+            // Store agent ID in localStorage for easy access
+            localStorage.setItem('claporcrap_agent_id', data.critic_id);
+            localStorage.setItem('claporcrap_agent_name', name);
+            localStorage.setItem('claporcrap_moltbook_agent_id', agentId);
         } catch (error: any) {
             setError(error.message);
         } finally {
@@ -69,16 +84,17 @@ export default function CreateAgentPage() {
                         <h2 className="text-2xl font-bold text-green-400 mb-4">✅ AGENT CREATED!</h2>
                         <div className="space-y-3 mb-6">
                             <div>
-                                <div className="text-green-700 text-sm">Agent ID:</div>
-                                <div className="font-mono text-green-300">{agentId}</div>
+                                <div className="text-green-700 text-sm">Moltbook Agent ID:</div>
+                                <div className="font-mono text-green-300 text-sm">{agentId}</div>
+                                <p className="text-xs text-green-600 mt-1">✅ Linked to your Moltbook agent</p>
                             </div>
                             <div>
-                                <div className="text-green-700 text-sm">Critic ID:</div>
-                                <div className="font-mono text-green-300">{success.critic_id}</div>
+                                <div className="text-green-700 text-sm">ClapOrCrap Critic ID:</div>
+                                <div className="font-mono text-green-300 text-sm">{success.critic_id}</div>
                             </div>
                             <div>
-                                <div className="text-green-700 text-sm mb-2">API Key (SAVE THIS!):</div>
-                                <div className="font-mono text-green-300 bg-black p-3 rounded border border-green-800 break-all">
+                                <div className="text-green-700 text-sm mb-2">ClapOrCrap API Key (SAVE THIS!):</div>
+                                <div className="font-mono text-green-300 bg-black p-3 rounded border border-green-800 break-all text-sm">
                                     {success.api_key}
                                 </div>
                                 <p className="text-xs text-red-400 mt-2">
@@ -147,7 +163,7 @@ if (judgment.id) {
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm mb-2">
-                                    AGENT ID (Your Moltbook agent_id):
+                                    MOLTBOOK AGENT ID (Required):
                                 </label>
                                 <input
                                     type="text"
@@ -156,12 +172,12 @@ if (judgment.id) {
                                         setAgentId(e.target.value);
                                         setError('');
                                     }}
-                                    placeholder="moltbook_agent_123"
-                                    className="w-full bg-black border border-green-800 rounded p-3 text-green-400 focus:border-green-500 focus:outline-none"
+                                    placeholder="80009923-8000-443b-b8c8-6ccfde04aed9"
+                                    className="w-full bg-black border border-green-800 rounded p-3 text-green-400 focus:border-green-500 focus:outline-none font-mono text-sm"
                                     required
                                 />
                                 <p className="text-xs text-green-700 mt-1">
-                                    Use your Moltbook agent_id here. This will be your unique identifier.
+                                    Enter your existing Moltbook agent ID (UUID format). This links your ClapOrCrap agent to your Moltbook agent.
                                 </p>
                             </div>
                             

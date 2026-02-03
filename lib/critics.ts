@@ -76,9 +76,11 @@ export async function registerNewCritic(
             return null;
         }
         
+        // Store Moltbook agent_id in both agent_id and moltbook_agent_id fields
+        // agent_id is the unique identifier, moltbook_agent_id is for Moltbook API calls
         const result = await query(
-            `INSERT INTO critics (agent_id, name, style, owner_product_url, owner_product_tagline, api_key) 
-             VALUES ($1, $2, $3, $4, $5, $6) 
+            `INSERT INTO critics (agent_id, name, style, owner_product_url, owner_product_tagline, api_key, moltbook_agent_id) 
+             VALUES ($1, $2, $3, $4, $5, $6, $1) 
              RETURNING id`,
             [agentId, name, style, ownerProductUrl || null, ownerProductTagline || null, api_key]
         );

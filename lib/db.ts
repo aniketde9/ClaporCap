@@ -5,12 +5,17 @@ const sql = neon(process.env.DATABASE_URL!);
 // Helper to build query results in Supabase-like format
 export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
     try {
-        const result = await sql(text, params);
-        // NeonDB returns rows as an array
+        // Use sql.query() for parameterized queries (newer NeonDB API)
+        const result = await sql.query(text, params);
+        // NeonDB query() returns { rows: [...] } or array directly depending on version
         if (Array.isArray(result)) {
             return result;
         }
-        // If single row, wrap in array
+        // Handle object with rows property
+        if (result && typeof result === 'object' && 'rows' in result) {
+            return (result as any).rows || [];
+        }
+        // If single row object, wrap in array
         if (result && typeof result === 'object') {
             return [result];
         }

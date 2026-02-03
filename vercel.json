@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron/heartbeat",
+      "path": "/api/cron/collect-feedback",
       "schedule": "* * * * *"
     }
   ]
